@@ -10,6 +10,16 @@
 
 :- http_handler(root(query), handle_query, [post]).
 
+
+:- consult('procurement_kb.pl').
+
+bindings_to_dict([], _).
+bindings_to_dict([Name=Value|T], Dict) :-
+    atom_string(Name, NameStr), % convert atom to string
+    Dict.put(NameStr, Value),
+    bindings_to_dict(T, Dict).
+
+
 server(Port) :-
     http_server(http_dispatch, [port(Port)]).
 
@@ -18,7 +28,23 @@ handle_query(Request) :-
                 [ methods([get,post,delete])
                 ]),
     http_read_json_dict(Request, Dict),
-    format(string(Fact), Dict.get(fact)),
+    Fact = Dict.get(fact),
     term_string(Term, Fact),
-    (call(Term) -> Result = true ; Result = false),
-    reply_json_dict(_{result: Result}).
+    Term =.. [Functor|Args],
+    length(Args, Arity),
+    (safe_predicate(Functor/Arity) ->
+        (findall(Args, call(Term), Results),
+         maplist(term_string, Results, ResultsStr),
+         reply_json_dict(_{result: "true", bindings: ResultsStr})
+        ;
+         reply_json_dict(_{result: "false"})
+        )
+    ;
+        reply_json_dict(_{error: "Unsafe predicate"})
+    ).
+
+
+safe_predicate(father/2).
+safe_predicate(mother/2).
+% Add more predicates here as per your requirement.
+
