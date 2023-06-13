@@ -3,7 +3,7 @@ import openai
 import os
 
 
-openai.api_key = "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"
+openai.api_key = ""
 prolog = Prolog()
 
 def ask_prolog(query):
