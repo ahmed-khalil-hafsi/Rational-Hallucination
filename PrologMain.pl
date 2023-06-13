@@ -44,7 +44,7 @@ handle_query(Request) :-
     ).
 
 
-safe_predicate(father/2).
-safe_predicate(mother/2).
+safe_predicate(supplier/2).
+
 % Add more predicates here as per your requirement.
 

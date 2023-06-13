@@ -1,2 +1,2 @@
-father(ahmed,fethy).
-mother(ahmed,samia).
+supplier(x,supplier_a).
+supplier(x,supplier_b).
